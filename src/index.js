@@ -4,9 +4,7 @@ import ReactDOM from 'react-dom';
 class Tecla extends React.Component {
   render() {
     return(
-      // <div>
-        <button onClick={this.props.click}>{this.props.number}</button>
-      // </div>
+        <button className={`butao ${this.props.type}`} onClick={this.props.click}>{this.props.number}</button>
     )
   }
 }
@@ -16,65 +14,45 @@ class Teclado extends React.Component {
   renderTecla(i, operacao=null) {
     if(typeof i === 'number'){
       return(
-        <Tecla number={i} click={() => this.props.butao(i)}/>
+        <Tecla number={i} type={'number'} click={() => this.props.butao(i)}/>
       )
     } else if (i === '=') {
       return(
-        <Tecla number={i} click={() => this.props.resolucaoCalculo()}/>
+        <Tecla number={i} type={'number'} click={() => this.props.resolucaoCalculo()}/>
       )
     } else {
       return(
-        <Tecla number={i} click={() => this.props.operacao(operacao)}/>
+        <Tecla number={i} type={'operation'} click={() => this.props.operacao(operacao, i)}/>
       )
     }
   }
 
   render() {
     return(
-      <div>
-        <div>
-          {this.renderTecla(9)}
-          {this.renderTecla(8)}
+      <div className='teclado'>
+        <div className="rowCalc" >
           {this.renderTecla(7)}
-          {this.renderTecla('+', 'soma')}
-
-          {/* <Tecla number='9' click={() => this.handleClick()}/>
-          <Tecla number='8' click={() => this.handleClick()}/>
-          <Tecla number='7' click={() => this.handleClick()}/>
-          <Tecla number='+' click={() => this.handleClick()}/> */}
+          {this.renderTecla(8)}
+          {this.renderTecla(9)}
+          {this.renderTecla('/', 'divisao')}
         </div>
-        <div>
-          {this.renderTecla(6)}
-          {this.renderTecla(5)}
+        <div className="rowCalc">
           {this.renderTecla(4)}
-          {this.renderTecla('-', 'substracao')}
-
-          {/* <Tecla number='6' click={() => this.handleClick()}/>
-          <Tecla number='5' click={() => this.handleClick()}/>
-          <Tecla number='4' click={() => this.handleClick()}/>
-          <Tecla number='-' click={() => this.handleClick()}/> */}
-        </div>
-        <div>
-          {this.renderTecla(3)}
-          {this.renderTecla(2)}
-          {this.renderTecla(1)}
+          {this.renderTecla(5)}
+          {this.renderTecla(6)}
           {this.renderTecla('*', 'multiplicacao')}
-          
-          {/* <Tecla number='3' click={() => this.handleClick()}/>
-          <Tecla number='2' click={() => this.handleClick()}/>
-          <Tecla number='1' click={() => this.handleClick()}/>
-          <Tecla number='*' click={() => this.handleClick()}/> */}
         </div>
-        <div>
+        <div className='rowCalc'>
+          {this.renderTecla(1)}
+          {this.renderTecla(2)}
+          {this.renderTecla(3)}
+          {this.renderTecla('-', 'substracao')}
+        </div>
+        <div className="rowCalc">
+          {this.renderTecla(0)}
           {this.renderTecla(0)}
           {this.renderTecla('=')}
-          {this.renderTecla('=')}
-          {this.renderTecla('/', 'divisao')}
-
-          {/* <Tecla number='0' click={() => this.handleClick()}/>
-          <Tecla number='=' click={() => this.handleClick()}/>
-          <Tecla number='=' click={() => this.handleClick()}/>
-          <Tecla number='/' click={() => this.handleClick()}/> */}
+          {this.renderTecla('+', 'soma')}
         </div>
       </div>
     )
@@ -85,7 +63,8 @@ class Display extends React.Component {
   render() {
     return(
       <div className='display'>
-        <h1 className='resultado'>{this.props.valor}</h1>
+        <h1 className='calculo text'>{this.props.calculo}</h1>
+        <h2 className='resultado text'>{this.props.resultado}</h2>
       </div>
     )
   }
@@ -96,7 +75,7 @@ class Geral extends React.Component {
     super(props)
 
     this.state = {
-      display: 0,
+      display: '',
       resultado: 0,
       numerosCalculados: ['', ''],
       operacaoSelecionada: '',
@@ -117,39 +96,53 @@ class Geral extends React.Component {
 
   butao(n) {
     console.log(`clicado em ${n}`)
-    this.setState( {display: n })
+    this.setState( {display: this.state.display+n })
 
-    const primeiroSetado = this.state.operacaoSelecionada.slice()
+    const primeiroFoiSetado = this.state.operacaoSelecionada.slice()
     const numeros = [ ...this.state.numerosCalculados ]
-    if(primeiroSetado){ 
-      this.setState({ numerosCalculados: [ numeros[0], (numeros[1]+n) ], display: (numeros[1]+n) })
+
+    if(primeiroFoiSetado){ 
+      this.setState({ numerosCalculados: [ numeros[0], (numeros[1]+n) ], display: (this.state.display+n) })
     } else {
-      this.setState({ numerosCalculados: [ (numeros[0]+n), numeros[1] ], display: (numeros[0]+n) })
+      this.setState({ numerosCalculados: [ (numeros[0]+n), numeros[1] ], display: (this.state.display+n) })
     }
   }
 
-  operacao(ope){
-    console.log(`Operação = ${ope}`)
-    this.setState( { operacaoSelecionada: ope } )
+  operacao(ope, simbolo){
+    if(this.state.numerosCalculados[0]){
+      console.log(`Operação = ${simbolo} ${ope}`)
+      this.setState( { operacaoSelecionada: ope, display: (this.state.display+simbolo) } )
+    } else {
+      console.log('Falta o primeiro numero')
+    }
   }
   resolucaoCalculo(){
-    const resultadoFinal = this.state[this.state.operacaoSelecionada]()
+    if(this.state.operacaoSelecionada){
+      const resultadoFinal = this.state[this.state.operacaoSelecionada]()
 
-    this.setState( { numerosCalculados: ['', ''], operacaoSelecionada: '' } )
-    this.setState( { display: resultadoFinal, resultado: resultadoFinal })
+      console.log(`Resultado = ${resultadoFinal} | ${this.state.numerosCalculados}`)
 
+      this.setState( { numerosCalculados: ['', ''], operacaoSelecionada: '' } )
+      this.setState( { resultado: resultadoFinal })
 
-    console.log(`Resultado = ${resultadoFinal}`)
+      
+
+    } else {
+      console.log('Sem parametros')
+    }
   }
 
   render() {
     const butao = (i) => this.butao(i)
-    const operacao = (i) => this.operacao(i)
+    const operacao = (i, h) => this.operacao(i, h)
     const resolucaoCalculo = (i) => this.resolucaoCalculo(i)
 
     return(
-      <div>
-        <Display valor={this.state.display}/>
+      <div className="bodyCalc">
+        <Display 
+          calculo={this.state.display}
+          resultado={this.state.resultado}
+          />
         <Teclado 
           butao={butao} 
           operacao={operacao} 

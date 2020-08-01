@@ -9,6 +9,9 @@
       name="description"
       content="Web site created using create-react-app"
     />
+
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300&display=swap" rel="stylesheet"> 
+
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
     <!--
       manifest.json provides metadata used when your web app is installed on a
@@ -25,6 +28,75 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>React App</title>
+    <style>
+
+      *{
+        padding: 0px;
+        margin: 0px;
+      }
+
+      body {
+        background-color: darkcyan;
+      }
+
+      #root{
+        margin-top: 10%;
+        display: flex;
+        justify-content: center;
+      }
+      
+      .bodyCalc {
+        border: solid 2px black;
+        margin: solid 2px black;
+        position: relative;
+        width: 300px;
+        height: 400px;
+
+        font-family: 'Noto Sans JP', sans-serif;;
+
+        display: flex;
+        flex-direction: column;
+      }
+
+      .display {
+        background-color: honeydew;
+        color: gray;
+        height: 30%;
+
+        text-align: right;
+      }
+      .display .text {
+        padding-top: 10px;
+        padding-right: 2%;
+      }
+
+
+      .teclado {
+        height: 70%;
+        border-right: solid 15px rgb(0, 196, 75);
+        display: inline-block;
+      }
+
+      .rowCalc {
+        height: 25%;
+      }
+
+      .butao {
+        background-color: gray;
+        border: none;
+        color: white;
+        width: 25%;
+        height: 100%;
+      }
+
+       .number {
+        background-color: rgb(78, 78, 78);
+      }
+       .operation {
+        background-color: gray;
+      }
+
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
