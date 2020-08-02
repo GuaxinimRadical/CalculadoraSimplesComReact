@@ -79,6 +79,8 @@ class Geral extends React.Component {
       resultado: 0,
       numerosCalculados: ['', ''],
       operacaoSelecionada: '',
+      operador: '',
+      operacaoFinalizada: false,
       soma(){
          return parseInt(this.numerosCalculados[0]) + parseInt(this.numerosCalculados[1])
         },
@@ -96,7 +98,9 @@ class Geral extends React.Component {
 
   butao(n) {
     console.log(`clicado em ${n}`)
-    this.setState( {display: this.state.display+n })
+    //this.setState( {display: this.state.display+n })
+
+    this.verificacao(n)
 
     const primeiroFoiSetado = this.state.operacaoSelecionada.slice()
     const numeros = [ ...this.state.numerosCalculados ]
@@ -111,7 +115,12 @@ class Geral extends React.Component {
   operacao(ope, simbolo){
     if(this.state.numerosCalculados[0]){
       console.log(`Operação = ${simbolo} ${ope}`)
-      this.setState( { operacaoSelecionada: ope, display: (this.state.display+simbolo) } )
+      this.setState( { 
+        operacaoSelecionada: ope, 
+        display: (this.state.display+simbolo), 
+        operador: simbolo
+      } )
+      this.verificacao(simbolo)
     } else {
       console.log('Falta o primeiro numero')
     }
@@ -122,14 +131,27 @@ class Geral extends React.Component {
 
       console.log(`Resultado = ${resultadoFinal} | ${this.state.numerosCalculados}`)
 
-      this.setState( { numerosCalculados: ['', ''], operacaoSelecionada: '' } )
-      this.setState( { resultado: resultadoFinal })
-
-      
-
+      this.setState( { display: '' } )
+      this.setState( { resultado: resultadoFinal, operacaoFinalizada: true })
     } else {
       console.log('Sem parametros')
     }
+  }
+
+  verificacao(butaoPressionado) {
+    if(this.state.operacaoFinalizada){
+      console.log('restart')
+      this.setState({ numerosCalculados: ['', ''], operacaoFinalizada: false })
+    }
+
+    if(typeof butaoPressionado === 'number'){
+      return
+    }
+
+    if(typeof butaoPressionado === 'string' && this.state.numerosCalculados[1] ){
+      this.setState({ display: this.state.display.replace( this.state.operador, butaoPressionado) })
+    }
+
   }
 
   render() {
