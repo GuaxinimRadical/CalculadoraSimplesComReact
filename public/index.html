@@ -74,27 +74,31 @@
       .teclado {
         height: 70%;
         border-right: solid 15px rgb(0, 196, 75);
-        display: inline-block;
-      }
+        display: grid;
 
-      .rowCalc {
-        height: 25%;
+        grid-template-columns: repeat(4, 1fr) ;
+        grid-template-rows: repeat(4, 1fr);
       }
-
       .butao {
-        background-color: gray;
         border: none;
         color: white;
-        width: 25%;
-        height: 100%;
+        background-color: rgb(78, 78, 78);
+
       }
 
-       .number {
-        background-color: rgb(78, 78, 78);
+      .colunaOperacoes {
+        grid-column: 4/5;
+        grid-row: 1/5;
+
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
       }
-       .operation {
+      .colunaOperacoes > button {
         background-color: gray;
+        flex-grow: 1;
       }
+
 
     </style>
   </head>

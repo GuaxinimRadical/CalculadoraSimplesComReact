@@ -30,30 +30,24 @@ class Teclado extends React.Component {
   render() {
     return(
       <div className='teclado'>
-        <div className="rowCalc" >
           {this.renderTecla(7)}
           {this.renderTecla(8)}
           {this.renderTecla(9)}
-          {this.renderTecla('/', 'divisao')}
-        </div>
-        <div className="rowCalc">
           {this.renderTecla(4)}
           {this.renderTecla(5)}
           {this.renderTecla(6)}
-          {this.renderTecla('*', 'multiplicacao')}
-        </div>
-        <div className='rowCalc'>
           {this.renderTecla(1)}
           {this.renderTecla(2)}
           {this.renderTecla(3)}
-          {this.renderTecla('-', 'substracao')}
-        </div>
-        <div className="rowCalc">
           {this.renderTecla(0)}
           {this.renderTecla(0)}
           {this.renderTecla('=')}
-          {this.renderTecla('+', 'soma')}
-        </div>
+          <div className="colunaOperacoes">
+            {this.renderTecla('/', 'divisao')}
+            {this.renderTecla('x', 'multiplicacao')}
+            {this.renderTecla('-', 'substracao')}
+            {this.renderTecla('+', 'soma')}
+          </div>
       </div>
     )
   }
@@ -77,81 +71,104 @@ class Geral extends React.Component {
     this.state = {
       display: '',
       resultado: 0,
-      numerosCalculados: ['', ''],
-      operacaoSelecionada: '',
+      numerosCalculados: [],
+      operacoesSelecionadas: [],
       operador: '',
       operacaoFinalizada: false,
-      soma(){
-         return parseInt(this.numerosCalculados[0]) + parseInt(this.numerosCalculados[1])
-        },
-        substracao(){
-         return parseInt(this.numerosCalculados[0]) - parseInt(this.numerosCalculados[1])
-        },
-        multiplicacao(){
-         return parseInt(this.numerosCalculados[0]) * parseInt(this.numerosCalculados[1])
-        },
-        divisao(){
-         return parseInt(this.numerosCalculados[0]) / parseInt(this.numerosCalculados[1])
-        }
+      soma(n1, n2){
+         return n1 + n2
+      },
+      substracao(n1, n2){
+        return n1 - n2
+      },
+      multiplicacao(n1, n2){
+        return n1 * n2
+      },
+      divisao(n1, n2){
+        return n1/n2
       }
+    }
   }
 
   butao(n) {
     console.log(`clicado em ${n}`)
-    //this.setState( {display: this.state.display+n })
 
-    this.verificacao(n)
+    const numeros = this.state.numerosCalculados.slice() //Retorna uma copia
+    const indiceArrayAtual = this.state.operacoesSelecionadas.length
 
-    const primeiroFoiSetado = this.state.operacaoSelecionada.slice()
-    const numeros = [ ...this.state.numerosCalculados ]
+    if( numeros[indiceArrayAtual] ){
+      //Se o valor setado agr já possuir valor, sendo necessário somar o valor do botao digitado a ele
+      numeros[indiceArrayAtual] = (numeros[indiceArrayAtual]*10)+n
+      this.setState({ 
+        numerosCalculados: [ ...numeros ],
+        display: (this.state.display+n)
+      })
+    } else{
+      //Se caso o numero que sera setado ainda não possuir valor... (nesse caso, ele ainda não existe e será criado)
 
-    if(primeiroFoiSetado){ 
-      this.setState({ numerosCalculados: [ numeros[0], (numeros[1]+n) ], display: (this.state.display+n) })
-    } else {
-      this.setState({ numerosCalculados: [ (numeros[0]+n), numeros[1] ], display: (this.state.display+n) })
+      if(n===0) return //Impede de criar o numero, já que numeros inteiros não devem começar com zeros 
+
+      this.setState({ 
+        numerosCalculados: [ ...numeros, n],
+        display: (this.state.display+n)
+       })
     }
+    
+    setTimeout( () => this.resolucaoRapida(), 1 )
   }
 
   operacao(ope, simbolo){
-    if(this.state.numerosCalculados[0]){
-      console.log(`Operação = ${simbolo} ${ope}`)
+    const numeros = [ ...this.state.numerosCalculados.slice() ]
+    const indiceArrayAtual = this.state.operacoesSelecionadas.length
+
+    if( numeros[indiceArrayAtual]  ){
+      console.log(`Operação = ${ope} | ${simbolo}`)
       this.setState( { 
-        operacaoSelecionada: ope, 
+        operacoesSelecionadas: [ ...this.state.operacoesSelecionadas, ope ], 
         display: (this.state.display+simbolo), 
-        operador: simbolo
+        operador: simbolo // <---- APAGUE AFTER
       } )
-      this.verificacao(simbolo)
+    } else if( numeros[0] ) {
+      console.log(`Operação redefinida = ${ope} | ${simbolo}`)
+      this.setState( { 
+        operacoesSelecionadas: [ ...this.state.operacoesSelecionadas.slice(0, indiceArrayAtual-1), ope ], 
+        display: this.state.display.slice( 0, -1) + simbolo, //Substitui o ultimo char pelo q clicou
+        operador: simbolo // <---- APAGUE AFTER
+      } )
     } else {
-      console.log('Falta o primeiro numero')
+      console.log('Sem parametros iniciais')
     }
   }
+
+  resolucaoRapida() {
+    if(!this.state.operacoesSelecionadas[0] || this.state.operacoesSelecionadas.length === this.state.numerosCalculados.length)
+      return 'error'
+
+    const operacoes = this.state.operacoesSelecionadas.slice()
+    const numeros = this.state.numerosCalculados.slice() //Retorna uma copia
+    let resultadoFinal = 0
+
+    resultadoFinal = this.state[this.state.operacoesSelecionadas[0]](numeros[0], numeros[1])
+
+    for( let i = 2; i < numeros.length; i++ ){
+      resultadoFinal = this.state[this.state.operacoesSelecionadas[i-1]](resultadoFinal, numeros[i])
+    }
+    this.setState({ resultado: resultadoFinal })
+
+    console.log(`ResultadoFINAL = ${resultadoFinal} | VALORES: ${numeros}`)
+  }
+
   resolucaoCalculo(){
-    if(this.state.operacaoSelecionada){
-      const resultadoFinal = this.state[this.state.operacaoSelecionada]()
 
-      console.log(`Resultado = ${resultadoFinal} | ${this.state.numerosCalculados}`)
-
-      this.setState( { display: '' } )
-      this.setState( { resultado: resultadoFinal, operacaoFinalizada: true })
-    } else {
-      console.log('Sem parametros')
-    }
-  }
-
-  verificacao(butaoPressionado) {
-    if(this.state.operacaoFinalizada){
-      console.log('restart')
-      this.setState({ numerosCalculados: ['', ''], operacaoFinalizada: false })
-    }
-
-    if(typeof butaoPressionado === 'number'){
+    if( this.resolucaoRapida() === 'error' )
       return
-    }
 
-    if(typeof butaoPressionado === 'string' && this.state.numerosCalculados[1] ){
-      this.setState({ display: this.state.display.replace( this.state.operador, butaoPressionado) })
-    }
-
+    this.setState({
+      operacaoFinalizada: true,
+      display: '',
+      numerosCalculados: [],
+      operacoesSelecionadas: []
+    })
   }
 
   render() {
