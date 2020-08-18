@@ -1,2 +1,5 @@
 # CalculadoraSimplesComReact
-Um modelo de calculadora padrão e simples utilizando ReactJS. 
+
+![Screenshoot](screenshoot.png)
+
+Um modelo de calculadora construído em ReactJS inspirado na Calculadora Nativa do Android.
