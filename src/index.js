@@ -12,17 +12,13 @@ class Tecla extends React.Component {
 class Teclado extends React.Component {
 
   renderTecla(i, operacao=null) {
-    if(typeof i === 'number'){
-      return(
-        <Tecla number={i} type={'number'} click={() => this.props.butao(i)}/>
-      )
-    } else if (i === '=') {
+    if (i === '=') {
       return(
         <Tecla number={i} type={'number'} click={() => this.props.resolucaoCalculo()}/>
       )
     } else {
       return(
-        <Tecla number={i} type={'operation'} click={() => this.props.operacao(operacao, i)}/>
+        <Tecla number={i} type={'operation'} click={() => this.props.verificadorTecla(i, operacao)}/>
       )
     }
   }
@@ -90,8 +86,17 @@ class Geral extends React.Component {
     }
   }
 
-  butao(n) {
-    console.log(`clicado em ${n}`)
+  verificadorTecla(tecla, operacao=null) {
+    console.log(`clicado em ${tecla}`)
+
+    if(operacao){ //Se uma operação tiver sido setada
+      this.operacaoSetada(operacao, tecla)
+    }else {
+      this.numeroSetado(tecla)
+    }
+  }
+
+  numeroSetado(n) {
 
     const numeros = this.state.numerosCalculados.slice() //Retorna uma copia
     const indiceArrayAtual = this.state.operacoesSelecionadas.length
@@ -117,7 +122,7 @@ class Geral extends React.Component {
     setTimeout( () => this.resolucaoRapida(), 1 )
   }
 
-  operacao(ope, simbolo){
+  operacaoSetada(ope, simbolo){
     const numeros = [ ...this.state.numerosCalculados.slice() ]
     const indiceArrayAtual = this.state.operacoesSelecionadas.length
 
@@ -172,8 +177,7 @@ class Geral extends React.Component {
   }
 
   render() {
-    const butao = (i) => this.butao(i)
-    const operacao = (i, h) => this.operacao(i, h)
+    const verificadorTecla = (i, h) => this.verificadorTecla(i, h)
     const resolucaoCalculo = (i) => this.resolucaoCalculo(i)
 
     return(
@@ -183,9 +187,8 @@ class Geral extends React.Component {
           resultado={this.state.resultado}
           />
         <Teclado 
-          butao={butao} 
-          operacao={operacao} 
           resolucaoCalculo={resolucaoCalculo} 
+          verificadorTecla={verificadorTecla}
         />
       </div>
     )
